@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1"> 
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+		<link rel="stylesheet" href="flex.css" />
+		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+		<script src="serverDataSource.js"></script>
+		<script src="serversList.js"></script>
+		<script src="api/photoTimeApi.js"></script>
+		<script src="model/repos.js"></script>
+		<script src="splashPage.js"></script>
+		<script src="reposPage.js"></script>
+		<script src="repoPage.js"></script>
+		<script src="app.js"></script>
+		<script src="itemsPage.js"></script>
+		<script src="itemViewPage.js"></script>
+		<script>
+(function( $ ) {
+	// On document ready
+})( jQuery);
+	
+		</script>
+		<title></title>
+	</head>
+	<body>
+		<div data-role="page" id="settings" data-position="fixed">
+		<script>
+			function _reloadServers() {
+				reloadServers('settingsServers', true, 
+					{
+						onDelete: function(ctx, event, idx)
+						{
+							gServers.removeAt(idx);
+							gServers.storeServers();
+							_reloadServers();
+						}
+					}
+				);
+			}
+			
+			$("#saveNewServer").click(function(event) {
+				var ip = $("#serverip").val();
+				var port = $("#serverport").val();
+				console.log("saving ip, port");
+				console.log(ip);
+				console.log(port);
+				gServers.add({ipAddress:ip, port:port});
+				_reloadServers();
+			});
+			
+			$('#settings').bind('pagebeforeshow', function(event) {
+				console.log('settings - pagebeforeshow');
+				reloadServers('settingsServers', true, {
+					onDelete: function(ctx, event, idx)
+					{
+						gServers.removeAt(idx);
+						gServers.storeServers();
+						_reloadServers();
+					}
+				});
+			});
+		</script>
+			<div data-role="header">
+				<h1>Settings</h1>
+			</div><!-- /header -->
+
+			<div data-role="content" class="mylist draggable">
+				<ul class="overflowAuto" id="settingsServers" data-split-icon="gear" data-role="listview"></ul>
+			</div><!-- /content -->
+			<div data-role="popup" data-inline="true" id="newServer" data-position-to="window" data-dismissible="true">
+				<label for="serverip">New Server</label>
+				<input type="text" name="serverip" id="serverip" value="" placeholder="IP Address"/>
+				<input type="number" name="serverport" id="serverport" value="" placeholder="port"/>
+				<div data-role="navbar">
+					<a href="#" data-role="button" data-rel="back" data-inline="true">cancel</a>
+					<a href="#" id="saveNewServer" data-role="button" data-rel="back" data-inline="true">ok</a>
+				</div>
+			</div>
+			<div data-role="footer" data-position="fixed">
+				<div data-role="navbar" >
+					<a href="#newServer" data-role="button" data-rel="popup">Add Server</a>
+					<a href="index.html#splash" data-role="button" data-rel="back">Done</a>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
