@@ -6,7 +6,6 @@ function reloadServers(serverNodeId, isEditable, cbks)
 	// load servers
 	gServers.loadServers(function() {
 		var jServers = $("#" + serverNodeId);
-		//console.log(serverNodeId + ' ' + jServers);
 		jServers.empty();
 		var tmpl = '<a href="#" class="serverItem" id="serverItem-__id__"><div>ip: __ip__</div><div>port: __port__</div></a>';
 		if (isEditable)

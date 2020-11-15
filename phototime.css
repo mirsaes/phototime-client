@@ -1,0 +1,87 @@
+
+/*
+.hbox {
+    display: flex;
+    flex-direction: row;
+}
+
+.vbox {
+    display: flex;
+    flex-direction: column;
+}
+
+*/
+
+.hbox{
+    display: box;
+    box-orient: horizontal;
+    
+    display: -moz-box;
+    -moz-box-orient:horizontal;
+    
+    display: -webkit-box;
+    -webkit-box-orient: horizontal;
+}
+.flex1 {
+    box-flex: 1;
+    -moz-box-flex: 1;
+    -webkit-box-flex: 1;
+}
+
+.detailImageContainer {
+    position: relative;
+    display: flex;
+    flex: 1;
+    /*
+    overflow-y: scroll;
+    width: 100%;
+    */
+}
+
+a.rateItem.active-rating span.ui-btn-inner
+{
+    background-color: yellow;
+}
+
+a.hud-imageRating.active-rating span.ui-btn-inner
+{
+    background-color: yellow;
+}
+
+.detailImageHolder {
+    /*
+    overflow-y: scroll;
+    overflow-x: scroll;
+    width: 100%;
+    height: 100%;
+    */
+    flex: 1;
+}
+
+div#itemView {
+    display:flex;
+    flex-direction: column;
+}
+
+#mycontent {
+    display: flex;
+    flex: 1;
+    overflow-y: hidden;
+}
+
+.detailImage {
+    object-fit: contain;
+    max-width: 100%;
+}
+.detailImageHUD {
+    position:absolute;
+    top:0px;
+    background-color:white; 
+    opacity:0.5    
+}
+.detailImageRating
+{
+    display: flex;
+    flex-grow: 0;
+    user-select: none;
+}
