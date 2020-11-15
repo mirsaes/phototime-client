@@ -20,6 +20,7 @@ PhotoTimeConnection.prototype.getThumbUrl = function(thumb)
 	var thumbUrl = this.getServerUrl() + thumb
 	return thumbUrl.replace(/\\/g, "/");
 }
+
 // cbks.onSuccess, onError
 PhotoTimeConnection.prototype.getRepos = function(cbks) {
 	var req = this.createRequest(this.urlRoot + '/repos', cbks);
@@ -31,9 +32,69 @@ PhotoTimeConnection.prototype.getItems = function(itemId, cbks) {
 	var req = this.createRequest(this.urlRoot + '/item/' + itemId, cbks);
 	req();
 };
+
 PhotoTimeConnection.prototype.delItem = function(itemId, cbks) {
-	var req = this.createRequest(this.urlRoot + '/del/item/' + itemId, cbks);
-	req();
+
+	var url = `${this.urlRoot}/item/${itemId}`;
+	$.ajax({
+		type: "DELETE",
+		url: url,
+	}).done(function(data, textStatus, jqXHR){
+		console.log('delete ajax success');
+		if (cbks.onSuccess)
+			cbks.onSuccess(data);
+	}).fail(function(jqXHR, textStatus, errorThrown){
+		console.log('ajax FAILED');
+		if (cbks.onError)
+			cbks.onError(jqXHR);
+	});
+};
+
+PhotoTimeConnection.prototype.loadMetadata = async function(itemId, cbks) {
+	var url = `${this.urlRoot}/metadata/${itemId}`;
+	return $.ajax({
+		type:"GET",
+		url: url,
+		contentType: "application/json; charset=utf-8"
+	}).done(function(data, textStatus, jqXHR){
+		Promise.resolve(data);
+	}).fail(function(jqXHR, textStatus, errorThrown) {
+		//console.warn("failed" + textStatus + " " + errorThrown);
+		console.warn("failed to load metadata");
+		Promise.reject("failure");
+	});
+};
+
+PhotoTimeConnection.prototype.rateItem = function(itemId, rating, cbks) {
+	//var url = `${this.urlRoot}/item/${itemId}?rating=${rating}`;
+	var url = `${this.urlRoot}/item/${itemId}`;
+	/*
+	$.post(
+		url,
+		JSON.stringify({'rating':rating})
+		, function(data, status, jqXHR) {
+			console.log(status);
+
+		}		
+	);
+	*/
+	$.ajax({
+		type: "POST",
+		url: url,
+		data: JSON.stringify({"rating":rating})
+		, dataType: 'json'
+		, contentType: "application/json; charset=utf-8"
+	}).done(function(data, textStatus, jqXHR){
+		console.log('ajax success');
+		if (cbks.onSuccess)
+			cbks.onSuccess(data);
+	}).fail(function(jqXHR, textStatus, errorThrown){
+		console.log('ajax FAILED');
+		if (cbks.onError)
+			cbks.onError(jqXHR);
+	}).always(function() {
+		console.log('finished rating');
+	});
 };
 
 var gPhotoTimeAPI = (function() {
@@ -62,6 +123,7 @@ var gPhotoTimeAPI = (function() {
 		
 		return getRepos;
 	};
+
 	return {
 		connect: function(server) {
 			return new PhotoTimeConnection(server, createRequest);

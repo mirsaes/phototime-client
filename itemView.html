@@ -3,10 +3,11 @@
 	<head>
 
 		<meta name="viewport" content="width=device-width, initial-scale=1"> 
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
-		<link rel="stylesheet" href="flex.css" />
-		<script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-		<script src="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
+		<link rel="stylesheet" href="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+		<link rel="stylesheet" href="phototime.css" />
+		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+		<!-- <script src="https://code.jquery.com/jquery-1.9.1.js"></script>-->
+		<script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
 		<script src="serverDataSource.js"></script>
 		<script src="serversList.js"></script>
 		<script src="api/photoTimeApi.js"></script>
@@ -38,13 +39,39 @@
 			</div>
 			
 			<div id="mycontent" data-role="content" class="mylist draggable">
-				<div class="detailImageContainer" id="image"></div>
+				<div class="detailImageContainer" id="image">
+					<div class="detailImageHolder">
+						<img class="detailImage" src="" />
+					</div>
+
+					<div class="detailImageHUD">
+						<div class="detailImageLabel">
+							<div></div>
+						</div>
+						<div class="detailImageRating" style="visibility:hidden;">
+							<a data-role="button" data-rating="1" data-icon="star" data-iconshadow="false" data-iconpos="notext" class="ui-icon-nodisc ui-icon-alt hud-imageRating" ></a>
+							<a data-role="button" data-rating="2" data-icon="star" data-iconshadow="false" data-iconpos="notext" class="ui-icon-nodisc ui-icon-alt hud-imageRating" ></a>
+							<a data-role="button" data-rating="3" data-icon="star" data-iconshadow="false" data-iconpos="notext" class="ui-icon-nodisc ui-icon-alt hud-imageRating" ></a>
+							<a data-role="button" data-rating="4" data-icon="star" data-iconshadow="false" data-iconpos="notext" class="ui-icon-nodisc ui-icon-alt hud-imageRating" ></a>
+							<a data-role="button" data-rating="5" data-icon="star" data-iconshadow="false" data-iconpos="notext" class="ui-icon-nodisc ui-icon-alt hud-imageRating" ></a>
+						</div>
+					</div>
+				</div>
+
 			</div>
-			
+			<div data-role="popup" id="ratingPopup" >
+				<div data-role="navbar">
+					<a href="items.html#items" data-role="button" data-rating="1" data-rel="rate" data-icon="star" class="rateItem"></a>
+					<a href="items.html#items" data-role="button" data-rating="2" data-rel="rate" data-icon="star" class="rateItem"></a>
+					<a href="items.html#items" data-role="button" data-rating="3" data-rel="rate" data-icon="star" class="rateItem"></a>
+					<a href="items.html#items" data-role="button" data-rating="4" data-rel="rate" data-icon="star" class="rateItem"></a>
+					<a href="items.html#items" data-role="button" data-rating="5" data-rel="rate" data-icon="star" class="rateItem"></a>
+				</div>
+			</div>
 			<div data-role="footer" data-position="fixed">
 				<div data-role="navbar" data-iconpos="notext">
 					<a href="items.html#items" data-role="button" data-rel="back" data-icon="back" >Back</a>
-					<a href="items.html#items" data-role="button" data-rel="rate" data-icon="star" class="rateItem">Rating</a>
+					<a href="#ratingPopup" data-role="button" data-rel="popup" data-icon="star" >Rating</a>
 					<a href="items.html#items" data-role="button" data-rel="prev" data-icon="arrow-l" class="prevItem" >Prev</a>
 					<a href="items.html#items" data-role="button" data-rel="next" data-icon="arrow-r" class="nextItem" >Next</a>
 					<a href="items.html#items" data-role="button" data-rel="delete" data-icon="delete" class="deleteItem" style="float: right" >Delete</a>

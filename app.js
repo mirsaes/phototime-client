@@ -148,6 +148,7 @@ http://api.jquery.com/live/
 	});
 	
 }
+
 app.goBack = function() {
 	if (history.length == 0) {
 		if (typeof xnav !== 'undefined')
@@ -165,8 +166,13 @@ app.goBack = function() {
 		// window.close();
 	}*/
 };
+
 app.doBack = function() {
 	// pop parent
 	var group = app.location.parents.pop()
 	app.location.item = group
 };
+
+$(window).bind("beforeunload", function() {
+	console.log("TODO: last minute persist..?");
+});
