@@ -1,8 +1,21 @@
+
 FROM mirsaes/phototime-server
 # docker build -t mirsaes/phototime -f docker/Dockerfile .
 
 LABEL maintainer="mirsaes"
-#ENV NODE_ENV=production
+ENV NODE_ENV=production
 
-COPY . /phototime-client
-COPY docker/docker-app-config.json /usr/src/phototime-server/appConfig.json
+WORKDIR /phototime-client
+COPY . .
+
+RUN npm install cropperjs
+RUN mv node_modules/cropperjs/dist ./cropperjs-dist && \
+    mv node_modules/cropperjs/LICENSE ./cropperjs-license && \
+    rm -r node_modules && \
+    mkdir -p node_modules/cropperjs && \
+    mv cropperjs-dist node_modules/cropperjs/dist && \
+    mv cropperjs-license node_modules/cropperjs/LICENSE
+
+COPY docker/docker-app-config.json /phototime-server/appConfig.json
+
+WORKDIR /phototime-server/
