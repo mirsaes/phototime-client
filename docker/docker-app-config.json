@@ -1,0 +1,13 @@
+{
+    "root":"/phototime-data",
+    "thumbs":"thumbs",
+    "trash":"trash",
+    "repos":[
+    
+        {
+            "path":"/phototime-repos/repo1",
+            "label":"Phototime Repo Pictures"
+        }
+    ],
+    "webapp":"/phototime-client/"
+}

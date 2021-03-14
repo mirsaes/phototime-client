@@ -23,9 +23,9 @@ var gServers = (function () {
 		},
 		cleanupServers: function() {
 			var newServers = [];
-			for (idx = 0; idx < servers.length; ++idx) {
+			for (let idx = 0; idx < servers.length; ++idx) {
 				var server = servers[idx];
-				if (server.ipAddress == "" || server.port == "")
+				if (server.ip == "" || server.port == "")
 					continue;
 				newServers.push(server);
 			}
@@ -52,3 +52,5 @@ var gServers = (function () {
 		}
 	};
 })();
+
+export  { gServers };

@@ -1,3 +1,4 @@
+import { gPhotoTimeAPI } from '../api/photoTimeApi.js'
 /*
 [
 	{
@@ -7,8 +8,6 @@
 	}
 ]
 */
-var gRepos = [];
-
 function loadRepos(lvid, repos, cbks) {
 	$.mobile.loading('show');
 	var jRepos = $('#' + lvid);
@@ -17,10 +16,10 @@ function loadRepos(lvid, repos, cbks) {
 	var listItemsHtml = '';
 	
 	for (i = 0; i < repos.length; ++i) {
-		var repo = repos[i];
-		var h = tmpl.replace(/__idx__/g, i).replace(/__id__/g, repo.id).replace(/__thumb__/g, repo.thumb);
+		let repo = repos[i];
+		let h = tmpl.replace(/__idx__/g, i).replace(/__id__/g, repo.id).replace(/__thumb__/g, repo.thumb);
 		h = h.replace(/__label__/g, repo.label);
-		var liHtml = '<li id="repo-list-item-__idx__">' + h + '</li>';
+		let liHtml = '<li id="repo-list-item-__idx__">' + h + '</li>';
 		liHtml = liHtml.replace(/__idx__/g, i);
 		listItemsHtml += liHtml;
 		//jRepos.append(liHtml);
@@ -43,7 +42,7 @@ function refreshList(lvid)
 	$('#' + lvid).listview('refresh');
 }
 
-function loadRepo(lvid, repo, cbks) {
+function renderRepo(lvid, repo, gConx, cbks) {
 	//http://jquery-howto.blogspot.com/2009/02/5-easy-tips-on-how-to-improve-code.html
 	//<ul class="overflowAuto" id="repoItemsList" data-role="listview"></ul>
 	$.mobile.loading('show');
@@ -112,3 +111,4 @@ function loadRepo(lvid, repo, cbks) {
 	$('#'+lvid).listview('refresh');
 }
 	
+export { loadRepos, renderRepo }

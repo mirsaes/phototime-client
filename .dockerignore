@@ -1,0 +1,7 @@
+node_modules/**
+docker/Dockerfile
+.git
+.gitignore
+package-lock.json
+
+!node_modules/cropperjs/dist/**
