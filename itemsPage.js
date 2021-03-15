@@ -1,5 +1,6 @@
 import { gPhotoTimeAPI } from './api/photoTimeApi.js';
 import { appstate } from './appstate.js'
+import { app } from './app.js'
 
 var itemsPage = {};
 
@@ -18,18 +19,18 @@ itemsPage.loadItems = function()
 		applocation.parents.push(group);
 		applocation.item = item;
 		item.items = items;
-		var changePageOptions = {};
-		changePageOptions.allowSamePageTransition = true;
-		changePageOptions.transition='popup';
-		$.mobile.changePage('items.html#items', changePageOptions);
+		// don't change the page, just re-render?
+		// but then must handle back within the page..
+
+		itemsPage.loadItems();
 	};
 	
-	loadGroup('groupItemsList', group, {
+	renderGroup('groupItemsList', group, {
 		onSelect: function(idx)
 		{
-			//console.log('group item selected idx: ' + idx);
+			console.log('group item selected idx: ' + idx);
 			var item = group.items[idx];
-			//console.log('item.type='+item.type);
+			console.log(`item.type=${item.type}. id=${item.id}`);
 			group.selectedItemIdx = idx;
 			if (item.type == "file")
 			{
@@ -55,71 +56,79 @@ itemsPage.loadItems = function()
 
 };
 
-function loadGroup(lvid, group, cbks)
+function renderEmptyFolderGroup(lvid, listView, group)
+{
+	var deleteFolderHtml = 
+	`<a href="#" 
+		class="deleteItem" 
+		id="deleteItem-" 
+		data-role="button" 
+		data-icon="delete"
+		data-photoid="${group.id}">Delete
+	</a>`;
+
+	var emptyFolderHtml = 
+		`<li >
+			<a href="#">
+				<div>This folder is empty:</div>
+				<div>${group.id}</div>
+			</a>
+			${deleteFolderHtml}
+		</li>`;
+
+	listView.html(emptyFolderHtml);
+	$('.deleteItem').click(function(event) {
+		$.mobile.loading('show');
+		var photoid = this.getAttribute('data-photoid');
+		var gConx = gPhotoTimeAPI.getConnection();
+		var applocation = appstate.getLocation();
+		gConx.delItem(photoid, {
+			onSuccess: function(data) {
+				//console.log('deleted item: ' + photoid);
+				//console.log(data);
+				var parent = applocation.parents[applocation.parents.length-1];
+
+				app.removeItemFromParentById(photoid);
+				listView.empty();
+				$.mobile.loading('hide');
+				// go back?
+				app.goBack();
+				//loadGroup(lvid, parent, cbks);
+				// remove item from parent, nav to parent
+				/*
+				var test = group.items[idx];
+				if (test.id == photoid)
+				{
+					group.items.splice(idx, 1);
+					//var item2 = $("#mylist").find("li:contains('item2')");
+					//item2.remove();
+					//$('#' + lvid).listview('refresh');
+					listView.empty();
+					loadGroup(lvid, group, cbks);
+				}*/
+			},
+			onError: function() {
+				console.log('error');
+			}
+		});		
+	});
+
+	$('#' + lvid).listview('refresh');
+	$.mobile.loading('hide');
+	return;
+
+}
+
+function renderGroup(lvid, group, cbks)
 {
 	$.mobile.loading('show')
 
 	var itemClass = 'item';
 	var listView = $('#' + lvid);
+
 	var items = group.items;
 	if (items.length == 0) {
-
-		var deleteFolderHtml = 
-		`<a href="#" 
-			class="deleteItem" 
-			id="deleteItem-" 
-			data-role="button" 
-			data-icon="delete"
-			data-photoid="${group.id}">Delete
-		</a>`;
-
-		var emptyFolderHtml = 
-			`<li >
-				<a href="#">
-					<div>This folder is empty:</div>
-					<div>${group.id}</div>
-				</a>
-				${deleteFolderHtml}
-			</li>`;
-
-		listView.html(emptyFolderHtml);
-		$('.deleteItem').click(function(event) {
-			$.mobile.loading('show');
-			var photoid = this.getAttribute('data-photoid');
-			var gConx = gPhotoTimeAPI.getConnection();
-			var applocation = appstate.getLocation();
-			gConx.delItem(photoid, {
-				onSuccess: function(data) {
-					//console.log('deleted item: ' + photoid);
-					//console.log(data);
-					var parent = applocation.parents[applocation.parents.length-1];
-					app.removeItemFromParentById(photoid);
-					listView.empty();
-					$.mobile.loading('hide');
-					// go back?
-					app.goBack();
-					//loadGroup(lvid, parent, cbks);
-					// remove item from parent, nav to parent
-					/*
-					var test = group.items[idx];
-					if (test.id == photoid)
-					{
-						group.items.splice(idx, 1);
-						//var item2 = $("#mylist").find("li:contains('item2')");
-						//item2.remove();
-						//$('#' + lvid).listview('refresh');
-						listView.empty();
-						loadGroup(lvid, group, cbks);
-					}*/
-				},
-				onError: function() {
-					console.log('error');
-				}
-			});		
-		});
-
-		$('#' + lvid).listview('refresh');
-		$.mobile.loading('hide');
+		renderEmptyFolderGroup(lvid, listView, group);
 		return;
 	}
 	// 
@@ -165,8 +174,9 @@ function loadGroup(lvid, group, cbks)
 		listItemsHtml += liHtml;
 	}
 	
-	listView.append(listItemsHtml);
+	listView.html(listItemsHtml);
 	
+	$('.' + itemClass).unbind('click');
 	$('.' + itemClass).click(function(event) {
 		if (cbks.onSelect)
 		{
@@ -175,7 +185,28 @@ function loadGroup(lvid, group, cbks)
 			cbks.onSelect(idx);
 		}
 	});
-	
+
+	$('a[data-rel="custom-back"]').unbind('click');
+	$('a[data-rel="custom-back"]').click(function(event) {
+		event.preventDefault();
+		$.mobile.loading('show');
+		var applocation = appstate.getLocation();
+		if (applocation.item.type=='folder' && applocation.parents.length > 0) {
+			// if have parents and parent is a folder
+			// than just change state and refresh
+			// otherwise issue go back
+			if (applocation.parents[applocation.parents.length-1].type == 'folder') {
+				app.doBack();
+				itemsPage.loadItems();
+			} else {
+				app.goBack();
+			}
+		}
+		$.mobile.loading('hide');
+		return false;
+	});
+
+	$('.deleteItem').unbind('click');
 	$('.deleteItem').click(function(event) {
 		$.mobile.loading('show');
 		var idx;
@@ -212,11 +243,9 @@ function loadGroup(lvid, group, cbks)
 	$.mobile.loading('hide');
 }
 
-$(document).on('pagebeforeshow',"#items", function() {		
+$(document).on('pagebeforeshow',"#items", function() {
 	itemsPage.loadItems();
 });
 
-//window.itemsPageLoadItems = function() {
-//}
 
 export { itemsPage }

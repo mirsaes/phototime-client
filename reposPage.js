@@ -1,6 +1,6 @@
 import {appstate } from './appstate.js'
 import { gPhotoTimeAPI } from './api/photoTimeApi.js'
-import { loadRepos } from './model/repos-list.js'
+import { renderRepos } from './model/repos-list.js'
 import { gRepos } from './repoDataSource.js'
 
 var reposPage = {
@@ -16,7 +16,7 @@ reposPage.loadRepos = function() {
 		$.mobile.changePage('repo.html#repo');
 	};
 	
-	loadRepos('reposList', gRepos.getRepos(), {
+	renderRepos('reposList', gRepos.getRepos(), {
 		onSelect: function(idx)
 		{
 			//console.log('repos selected idx: ' + idx);

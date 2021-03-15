@@ -8,21 +8,26 @@ import { gPhotoTimeAPI } from '../api/photoTimeApi.js'
 	}
 ]
 */
-function loadRepos(lvid, repos, cbks) {
+function renderRepos(lvid, repos, cbks) {
 	$.mobile.loading('show');
 	var jRepos = $('#' + lvid);
-	var tmpl = '<a href="#" class="repoItem" id="repoItem-__idx__"><div>__label__</div><img src="__thumb__" /></a>';	
 	var i;
 	var listItemsHtml = '';
 	
 	for (i = 0; i < repos.length; ++i) {
+
 		let repo = repos[i];
-		let h = tmpl.replace(/__idx__/g, i).replace(/__id__/g, repo.id).replace(/__thumb__/g, repo.thumb);
-		h = h.replace(/__label__/g, repo.label);
-		let liHtml = '<li id="repo-list-item-__idx__">' + h + '</li>';
-		liHtml = liHtml.replace(/__idx__/g, i);
+		let liHtml = `
+			<li id="repo-list-item-${i}">
+				<a href="#" style="display:flex" class="repoItem" id="repoItem-${i}"> 
+					<div class="item-thumb"> 
+						<img class="item-thumb" src="${repo.thumb}" /> 
+					</div> 
+					<div class="item-label">${repo.label}</div> 
+				</a>
+			</li>`;
+
 		listItemsHtml += liHtml;
-		//jRepos.append(liHtml);
 	}
 	jRepos.append(listItemsHtml);
 	
@@ -58,46 +63,27 @@ function renderRepo(lvid, repo, gConx, cbks) {
 	var i;
 	var listItemsHtml = '';
 	var liHtmlAy = [];
-	//liHtmlAy.push('<ul class="overflowAuto" id="repoItemsList" data-role="listview" onLoad="refreshList("' + lvid + '">');
-	//liHtmlAy.push('<ul class="overflowAuto" id="repoItemsList" data-role="listview">');
 	// faster if insert the ul element as well?
 	// key, value, compile once.. find each __xxx__
 	for (i = 0; i < items.length; ++i) {
 		let item = items[i];
-		//var h = tmpl.replace(/__idx__/g, i).replace(/__id__/g, item.id).replace(/__thumb__/g, gConx.getThumbUrl(item.thumb)).replace(/__label__/g, item.label);
-		//var liHtml = '<li id="list-' + itemClass + '-__idx__">' + h + '</li>';
-		//liHtml = liHtml.replace(/__idx__/g, i);
-		//var liHtml = '<li id="list-' + itemClass + '-' + i + '>' + tmpl + '</li>';
-		liHtmlAy.push('<li id="');
-		liHtmlAy.push(itemClass);
-		liHtmlAy.push('-');
-		liHtmlAy.push(i);
-		liHtmlAy.push('">');
-		
-		// h
-		liHtmlAy.push('<a href="#" class="');
-		liHtmlAy.push(itemClass);
-		if (i == selectedIdx)
-		{
-			liHtmlAy.push(' selectedItem');
-		}
-		liHtmlAy.push('" id="');
-		liHtmlAy.push(itemClass);
-		liHtmlAy.push('-');
-		liHtmlAy.push(i);
-		liHtmlAy.push('"><div>');
-		liHtmlAy.push(item.label);
-		liHtmlAy.push('</div><img src="');
-		liHtmlAy.push(gConx.getThumbUrl(item.thumb));
-		liHtmlAy.push('" /></a>');
-		
-		liHtmlAy.push('</li>');
-		//listItemsHtml += liHtml;
+		let selectedClass = (i== selectedIdx?"selectedItem":"");
+		let itemThumbUrl = gConx.getThumbUrl(item.thumb);
+
+
+		let liHtml = `
+			<li id=${itemClass}-${i}>
+				<a href="#" style="display: flex" class="${itemClass} ${selectedClass}" id="${itemClass}-${i}">
+					<div class="item-thumb">
+						<img class="item-thumb" src="${itemThumbUrl}"/>
+					</div>
+					<div class="item-label">${item.label}</div>
+				</a>
+			</li>
+		`;
+		liHtmlAy.push(liHtml);
 	}
-	//liHtmlAy.push('</ul>');
-	//jListView.append(listItemsHtml);
-	jListView.append(liHtmlAy.join(''));
-	//jListParent.html(liHtmlAy.join(''));
+	jListView.html(liHtmlAy.join(''));
 	
 	$('.' + itemClass).click(function(event) {
 		if (cbks.onSelect)
@@ -111,4 +97,4 @@ function renderRepo(lvid, repo, gConx, cbks) {
 	$('#'+lvid).listview('refresh');
 }
 	
-export { loadRepos, renderRepo }
+export { renderRepos, renderRepo }

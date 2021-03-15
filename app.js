@@ -39,6 +39,7 @@ class PhotoTimeApp
 	}
 	
 	// {nextPopCount: 1, nextParent, next: item, prevPopCount: 0, prevParent: null, prev: item}
+	// {nextPopCount: 1, parentsNextSibling, next: item, prevPopCount: 0, parentsPrevSibling: null, prev: item}
 	getAdjNav(item)
 	{
 		var ret = {};
@@ -59,7 +60,7 @@ class PhotoTimeApp
 			
 			if (adjItems.next) {
 				ret.nextPopCount = 1;
-				ret.nextParent = adjItems.next;
+				ret.parentsNextSibling = adjItems.next;
 				//ret.next = adjItems.next.items[0];
 			}
 		}
@@ -73,7 +74,7 @@ class PhotoTimeApp
 			
 			if (adjItems.prev) {
 				ret.prevPopCount = 1;
-				ret.prevParent = adjItems.prev;
+				ret.parentsPrevSibling = adjItems.prev;
 				//ret.prev = adjItems.prev.items[adjItems.prev.items.length-1]
 			}
 		}
@@ -151,7 +152,7 @@ class PhotoTimeApp
 				xnav.exit();
 			}
 		}
-		console.log("history.length=" + history.length);
+		//console.log(`history.length=${history.length}`);
 		this.doBack();
 		history.back();
 		
@@ -165,8 +166,18 @@ class PhotoTimeApp
 	doBack() {
 		// pop parent
 		var applocation = appstate.getLocation();
-		var group = applocation.parents.pop()
-		applocation.item = group
+		if (applocation.parents.length == 0) {
+			if (applocation.repoIdx >= 0) {
+				applocation.repoIdx=-1;
+			} else {
+				applocation.serverIdx = -1;
+			}
+		} else {
+			// within repo still
+			var group = applocation.parents.pop();
+			applocation.item = group;
+		}
+
 	}
 }
 

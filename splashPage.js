@@ -18,7 +18,8 @@ splashPage.loadServers = function()
 					appstate.setServer(server, idx)
 					//app.location.serverIdx = idx;
 					// have data, goto repos
-					$.mobile.changePage('repos.html#repos');
+					//$.mobile.changePage('repos.html#repos');
+					$('body').pagecontainer("change", "repos.html#repos");
 				}
 			});
 		}

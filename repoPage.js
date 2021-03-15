@@ -25,10 +25,11 @@ repoPage.loadRepo = function() {
 		onSelect: function(idx)
 		{
 			var applocation = appstate.getLocation();
-			//console.log('repo item selected idx: ' + idx);
+			
 			repo.selectedItemIdx = idx;
 			var item = repo.items[idx];
-			
+
+			console.log(`repo item selected. idx=${idx}. type=${item.type}. id=${item.id}`);
 			if (item.type == "file")
 			{
 				applocation.parents.push(repo);
@@ -50,7 +51,7 @@ repoPage.loadRepo = function() {
 	});
 }
 
-$(document).on('pagebeforeshow', "#repo", function() {		
+$(document).on('pagebeforeshow', "#repo", function() {
 	repoPage.loadRepo();
 });
 

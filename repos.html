@@ -3,8 +3,10 @@
 	<head>
 		<title>PhotoTime</title>
 		<script>
-			if (typeof app == 'undefined')
+			if (typeof app == 'undefined') {
+				console.log('navigating back to top');
 				window.location="index.html";
+			}
 		</script>
 	</head>
 	<body>
