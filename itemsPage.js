@@ -4,6 +4,9 @@ import { app } from './app.js'
 
 var itemsPage = {};
 
+/**
+ * 
+ */
 itemsPage.loadItems = function()
 {
 	var applocation = appstate.getLocation();
@@ -13,15 +16,15 @@ itemsPage.loadItems = function()
 		group = applocation.parents.pop();
 		applocation.item = group;
 	}
+
 	var onGroupItemsAvail = function(item, items)
 	{
-		//console.log('TODO: just pop node when going back?');
 		applocation.parents.push(group);
 		applocation.item = item;
 		item.items = items;
+
 		// don't change the page, just re-render?
 		// but then must handle back within the page..
-
 		itemsPage.loadItems();
 	};
 	
@@ -158,10 +161,17 @@ function renderGroup(lvid, group, cbks)
 	
 	var gConx = gPhotoTimeAPI.getConnection();
 
-	for (i = 0; i < items.length; ++i) {
+	// TODO: need to "page" through these thumbs as loading all these images takes a long time
+	// or lazy load more
+	// maybe set timeout to load more? would that help
+	//var maxLoadItems = Math.min(100, items.length);
+	const maxLoadItems = items.length;
+	//listItemsHtml = createListItems(0, maxLoadItems, items, tmpl, gConx, itemClass)
+	for (i = 0; i < maxLoadItems; ++i) {
 		let item = items[i];
 		let h = tmpl.replace(/__idx__/g, i);
 		h = h.replace(/__id__/g, item.id);
+		
 		h = h.replace(/__thumb__/g, gConx.getThumbUrl(item.thumb));
 		h = h.replace(/__label__/g, item.label);
 		if (i == selectedIdx) {
@@ -173,7 +183,16 @@ function renderGroup(lvid, group, cbks)
 		let liHtml = `<li id="list-${itemClass}-${i}">${h}</li>`;
 		listItemsHtml += liHtml;
 	}
-	
+	/*
+	if (maxLoadItems < items.length) {
+		setTimeout(() => {
+			// load more..?
+			let listView = $(`#${lvid}`);
+			
+		}, 100);
+	}
+	*/
+
 	listView.html(listItemsHtml);
 	
 	$('.' + itemClass).unbind('click');
@@ -242,6 +261,61 @@ function renderGroup(lvid, group, cbks)
 	$('#' + lvid).listview('refresh');
 	$.mobile.loading('hide');
 }
+
+class Poller
+{
+	constructor(method, periodMillis) {
+		this.method = method;
+		this.periodMillis = periodMillis?periodMillis:30000;
+
+		this.boundFn = function() {
+			this.onTime();
+		}.bind(this);
+
+		setTimeout(this.boundFn, periodMillis);
+	}
+
+
+	onTime() {
+		this.method(this);
+		setTimeout(this.boundFn, this.periodMillis);
+	}
+	getPeriodMillis() {
+		return this.periodMillis;
+	}
+	setPeriodMillis(newPeriodMillis) {
+		this.periodMillis = newPeriodMillis;
+	}
+}
+
+function statusCheck(poller) {
+	// call server to check thumb status
+	var gConx = gPhotoTimeAPI.getConnection();
+	if (!gConx) {
+		return;
+	}
+
+	gConx.checkStatus().then((data) => {
+		if (data.activeThumbTasks.length) {
+			$('#items-page-status-text').html("thumb status: working on it, thumbs remaining: " + data.activeThumbTasks.length);
+			poller.setPeriodMillis(3000);
+		} else {
+			$('#items-page-status-text').html("thumb status: all done");
+			// slow down check
+			const periodMillis = poller.getPeriodMillis();
+			if (periodMillis < 30000) {
+				poller.setPeriodMillis(periodMillis+5000);
+			}
+			
+		}
+	}, (reason) => {
+		console.warn('failed to check server status');
+	}).catch( (reason) => {
+		console.log(reason);
+	});
+}
+
+var gPoller = new Poller(statusCheck, 5000);
 
 $(document).on('pagebeforeshow',"#items", function() {
 	itemsPage.loadItems();

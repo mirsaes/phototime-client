@@ -62,6 +62,8 @@ img.item-thumb
     */
 }
 
+
+
 /* jquerymobile 1.3.2 */
 /*
 a.rateItem.active-rating span.ui-btn-inner
@@ -144,6 +146,13 @@ div#imageEditPage {
     flex-grow: 0;
     user-select: none;
 }
+
+.detail-item-content {
+    padding: 0;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
 #ratingPopup {
     display: flex;
 }
@@ -162,4 +171,13 @@ img#imageEdit
 .ui-icon-phototime-aspect-select:after {
 	background-image: url("assets/aspect-select.svg");
     background-size: contain;
+}
+
+.navbar-horizontal {
+    display: flex;
+    align-items: center;
+}
+
+.items-page-status {
+    padding-left: 10pt;
 }

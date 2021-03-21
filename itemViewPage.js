@@ -237,17 +237,16 @@ itemViewPage.beforeShow = function()
 	// unbinding so don't fire event twice
 	// apparently goes into crazy hot loop or something if don't unbind..
 	// which i observed when forget to unbind nextItem.
-	
-	imageContainer.unbind("swipeleft");
-	imageContainer.on( "swipeleft", function(event) {
-		//console.log('swipeleft');
+	var swipeContainer = $('.swipe-area');
+	swipeContainer.unbind("swipeleft");
+	swipeContainer.on("swipeleft", function(event) {
 		onSwipeFunction(event, "left");
 	});
-	imageContainer.unbind("swiperight");
-	imageContainer.on("swiperight", function(event) {
-		//console.log('swiperight');
+	swipeContainer.unbind("swiperight");
+	swipeContainer.on("swiperight", function(event) {
 		onSwipeFunction(event, "right");
 	});
+
 
 	$('.editItem').unbind('click');
 	$('.editItem').click(function(event) {
@@ -403,8 +402,8 @@ function constrainImage(imgId, containerSize)
 	var containerIsPortrait = containerSize.h > containerSize.w;
 	img.containerWidth=containerSize.w;
 	img.containerHeight=containerSize.h;	
-	img.origWidth = img.width;
-	img.origHeight = img.height;
+	img.origWidth = img.naturalWidth;
+	img.origHeight = img.naturalHeight;
 	var containerRatio = containerSize.w/containerSize.h;
 	var imageRatio = img.width/img.height;
 	if (!img.style) {
@@ -445,6 +444,22 @@ function constrainImage(imgId, containerSize)
 	img.style.maxHeight=`${useh}px`;
 	img.style.height=`${useh}px`;
 	img.style.visibility='visible';
+	//img.style.display = 'none';
+
+	setTimeout(() => {
+		img.style.display='none';
+		var cnv = document.getElementById('detail-image-canvas');
+		var ctx = cnv.getContext("2d");
+		
+		cnv.width = usew;
+		cnv.height= useh;
+
+		// destination x, destination y, destination width, destination height
+		ctx.drawImage(img, 0, 0, usew, useh);
+		cnv.style.display='block';
+		panzoom(cnv);
+	});
+
 }
 
 function loadImage(nodeId, item)
@@ -463,6 +478,10 @@ function loadImage(nodeId, item)
 	imageContainer.find(".detailImageLabel div").empty().text(item.label);
 
 	var img = $(`#${imageId} img`)[0];
+	var cnv = document.getElementById('detail-image-canvas');
+	cnv.style.display='none';
+
+	delete img.style.display;
 	img.style.visibility="hidden";
 	$('.detailImageRating')[0].style.visibility='hidden';
 
@@ -477,14 +496,7 @@ function loadImage(nodeId, item)
 		});
 		}, 10);
 }
-/*
-$(window).resize(function(){
-	var detailImageHolder = $(".detailImageHolder");
-	var containerSize={"w": detailImageHolder.width(), "h": detailImageHolder.height()};
-	console.log(containerSize);
-});
 
-*/
 $(document).on('pagebeforeshow',"#itemView", function() {		
 	itemViewPage.beforeShow();
 });

@@ -6,6 +6,7 @@
 			if (typeof app == 'undefined')
 				window.location="index.html";
 		</script>
+
 	</head>
 	<body>
 		<div data-role="page" id="itemView" name="itemView">
@@ -13,10 +14,11 @@
 				<h1>Photo Time</h1>
 			</div>
 			
-			<div id="mycontent" data-role="content" class="mylist draggable">
+			<div id="mycontent" data-role="content" class="detail-item-content">
 				<div class="detailImageContainer" id="image">
 					<div class="detailImageHolder">
 						<img class="detailImage" alt="image detail" src="" />
+						<canvas id="detail-image-canvas" style="display: none;"></canvas>
 					</div>
 
 					<div class="detailImageHUD">
@@ -42,12 +44,14 @@
 				<a href="items.html#items" data-role="button" data-rating="5" data-rel="rate" data-iconpos="notext" data-icon="star" class="ui-icon-nodisc ui-icon-alt rateItem"></a>
 			</div>
 			<div data-role="footer" data-position="fixed">
-				<div data-role="navbar" data-iconpos="notext" >
+
+				<div data-role="navbar" data-iconpos="notext" class="navbar-horizontal">
 					<a href="items.html#items" data-role="button" data-rel="back" data-icon="back" >Back</a>
 					<a href="#ratingPopup" data-role="button" data-rel="popup" data-icon="star" >Rating</a>
 					<a href="items.html#items" data-role="button" data-rel="prev" data-icon="arrow-l" class="prevItem" >Prev</a>
 					<a href="items.html#items" data-role="button" data-rel="next" data-icon="arrow-r" class="nextItem" >Next</a>
 					<a href="items.html#items" data-role="button" data-rel="" data-icon="edit" class="editItem" >Edit</a>
+					<div class="swipe-area">Swipe Navigation Bar</div>
 					<a href="items.html#items" data-role="button" data-rel="delete" data-icon="delete" class="deleteItem" style="float: right" >Delete</a>
 				</div>
 			</div>

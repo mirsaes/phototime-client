@@ -117,6 +117,21 @@ class PhotoTimeConnection
 			Promise.reject("failure");
 		});		
 	}
+
+	async checkStatus()
+	{
+		var url = `${this.urlRoot}/status/thumbs`;
+
+		return $.ajax({
+			type:"GET",
+			url: url,
+		}).done(function(data, textStatus, jqXHR){
+			Promise.resolve(data);
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			console.warn('failed to check thumb status');
+			//Promise.reject('failure');
+		});
+	}
 }
 
 var gPhotoTimeAPI = (function() {

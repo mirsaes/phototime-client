@@ -1,0 +1,18 @@
+.navbar-horizontal a {
+    margin-left: 4pt;
+}
+
+.navbar-horizontal a.deleteItem {
+    position: absolute;
+    right: 6pt;
+}
+
+.navbar-horizontal .swipe-area
+{
+    flex: 0.7;
+    border-width: 2px;
+    border-style: solid;
+    border-color: black;
+    text-align: center;
+    user-select: none;
+}
