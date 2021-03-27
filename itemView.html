@@ -33,8 +33,25 @@
 							<a data-role="button" data-rating="5" data-icon="star" data-iconshadow="false" data-iconpos="notext" class="ui-icon-nodisc ui-icon-alt hud-imageRating" ></a>
 						</div>
 					</div>
+					<div class="itemViewMetaDataHUD">
+						<div style="display:flex;align-items:center">
+							<div style="flex:1;">Tags</div>
+							<a href="#addTagPopup" data-rel="popup" data-role="button" data-icon="plus" data-iconpos="notext"></a>
+						</div>
+						<ul style="" class="overflowAuto" id="itemViewTagsList" data-role="">							
+						</ul>
+					</div>
 				</div>
-
+			</div>
+			<div data-role="popup" id="addTagPopup">
+				<form>
+					<label for="new-tag-text">New Tag:</label>
+					<input type="text" name="new-tag-text" id="new-tag-text" value=""></input>
+				</form>
+				<div style="display:flex;">
+					<a href="items.html#items" id="new-tag-cancel" data-role="button" data-rel="back" data-icon="back" >Cancel</a>
+					<a href="items.html#items" id="new-tag-save" data-role="button" data-rel="ok" data-icon="check" >Save</a>
+				</div>
 			</div>
 			<div data-role="popup" id="ratingPopup" >
 				<a href="items.html#items" data-role="button" data-rating="1" data-rel="rate" data-iconpos="notext" data-icon="star" class="ui-icon-nodisc ui-icon-alt rateItem"></a>

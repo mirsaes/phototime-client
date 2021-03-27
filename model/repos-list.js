@@ -1,4 +1,6 @@
-import { gPhotoTimeAPI } from '../api/photoTimeApi.js'
+// don't know why I put this in the model folder
+// perhaps there was a different intention in the past
+// at some point will want to move the cheese
 /*
 [
 	{
@@ -53,15 +55,12 @@ function renderRepo(lvid, repo, gConx, cbks) {
 	$.mobile.loading('show');
 	var itemClass = 'item';
 	
-	//var jListParent = $('#' + 'repocontent');
 	var jListView = $('#' + lvid);
 	
 	var items = repo.items;
 	var selectedIdx = repo.selectedItemIdx;
 	
-	var tmpl = '<a href="#" class="' + itemClass + '" id="' + itemClass + '-__idx__"><div>__label__</div><img src="__thumb__" /></a>';	
 	var i;
-	var listItemsHtml = '';
 	var liHtmlAy = [];
 	// faster if insert the ul element as well?
 	// key, value, compile once.. find each __xxx__

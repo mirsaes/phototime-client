@@ -1,18 +1,6 @@
 
-/*
-.hbox {
-    display: flex;
-    flex-direction: row;
-}
-
-.vbox {
-    display: flex;
-    flex-direction: column;
-}
-
-*/
-
-.hbox{
+.hbox 
+{
     display: box;
     box-orient: horizontal;
     
@@ -22,7 +10,9 @@
     display: -webkit-box;
     -webkit-box-orient: horizontal;
 }
-.flex1 {
+
+.flex1 
+{
     box-flex: 1;
     -moz-box-flex: 1;
     -webkit-box-flex: 1;
@@ -32,11 +22,13 @@
 {
 
 }
+
 .item-label
 {
     display:flex;
     align-items:center;
 }
+
 div.item-thumb
 {
     width: 80pt;
@@ -46,6 +38,7 @@ div.item-thumb
     flex-direction: column;
     align-items: center;
 }
+
 img.item-thumb
 {
     max-width: 80pt;
@@ -62,29 +55,6 @@ img.item-thumb
     */
 }
 
-
-
-/* jquerymobile 1.3.2 */
-/*
-a.rateItem.active-rating span.ui-btn-inner
-{
-    background-color: yellow;
-}
-
-a.hud-imageRating.active-rating span.ui-btn-inner
-{
-    background-color: yellow;
-}
-*/
-a.active-rating::after
-{
-    background-color: yellow;
-}
-
-a.hud-imageRating.active-rating::after
-{
-    background-color: yellow;
-}
 /*ui-navbar*/
 .navbar-horizontal {
     display: flex;
@@ -100,6 +70,7 @@ a.hud-imageRating.active-rating::after
     */
     flex: 1;
 }
+
 .fitImageContainer {
     position:relative;
     display:flex;
@@ -109,6 +80,7 @@ a.hud-imageRating.active-rating::after
 .fitImageHolder {
     flex: 1;
 }
+
 img.fitImage {
     object-fit: contain;
     max-width: 100%;
@@ -118,66 +90,16 @@ div#itemView {
     display:flex;
     flex-direction: column;
 }
-/* specify so takes full space*/
-div#imageEditPage {
-    display:flex;
-    flex-direction: column;
-}
 
-#mycontent {
+#mycontent 
+{
     display: flex;
     flex: 1;
     overflow-y: hidden;
 }
 
-.detailImage {
-    object-fit: contain;
-    max-width: 100%;
-}
-.detailImageHUD {
-    position:absolute;
-    top:0px;
-    background-color:white; 
-    opacity:0.5    
-}
-.detailImageRating
-{
-    display: flex;
-    flex-grow: 0;
-    user-select: none;
-}
-
-.detail-item-content {
-    padding: 0;
-    margin-left: 1em;
-    margin-right: 1em;
-}
-
-#ratingPopup {
-    display: flex;
-}
-
-img#imageEdit
-{
-    width: 100%;
-    display: block;
-}
-
-.ui-icon-phototime-crop:after {
-	background-image: url("assets/crop.svg");
-    background-size: contain;
-}
-
-.ui-icon-phototime-aspect-select:after {
-	background-image: url("assets/aspect-select.svg");
-    background-size: contain;
-}
 
 .navbar-horizontal {
     display: flex;
     align-items: center;
-}
-
-.items-page-status {
-    padding-left: 10pt;
 }

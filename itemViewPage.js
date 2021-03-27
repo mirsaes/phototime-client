@@ -257,10 +257,9 @@ itemViewPage.beforeShow = function()
 		applocation.item = item;
 	
 		var photoid = item.id;
-		//console.log('edit Item ' + photoid);
 		$.mobile.changePage('imageEdit.html');
-
 	});
+
 
 	$('.rateItem').unbind('click');
 	$('.rateItem').click(function(event) {
@@ -279,10 +278,37 @@ itemViewPage.beforeShow = function()
 				applocation.item.rating = rating;
 				if (applocation.item.metadataLoaded && applocation.item.metadata) {
 					applocation.item.metadata.Rating = rating;
+
 					itemViewPage.onMetadataUpdated();
 				}
 			}
 		}});
+	});
+
+	$('#new-tag-save').unbind('click');
+	$('#new-tag-save').click(function(event) {
+		var applocation = appstate.getLocation();
+		var item = applocation.item;
+		var photoid = item.id;
+		var tag = $('#new-tag-text').val();
+		//var tag = 'test';
+		console.log(`add tag ${tag}- photoid=${photoid}`);
+
+		// make sure tag doesn't already exist..
+		if (item.tags && item.tags.indexOf(tag)>=0) {
+			return;
+		}
+
+		gPhotoTimeAPI.addTag(photoid, tag).then((val) => {
+			// done adding tag
+			// now update ui and metadata..
+			if (applocation.item.id === appstate.getLocation().item.id) {
+				var curTags = applocation.item.tags;
+				applocation.item.tags.push(tag);
+
+				itemViewPage.onMetadataUpdated();
+			}
+		});
 	});
 
 	$('#ratingPopup').popup({
@@ -347,18 +373,65 @@ itemViewPage.beforeShow = function()
 itemViewPage.onMetadataUpdated = function()
 {
 	var applocation = appstate.getLocation();
+
+	// update rating
 	var detailImageRating = $(".detailImageRating")[0];
 	detailImageRating.style.visibility="visible";
 
 	var rating = applocation.item.rating;
 
 	// highlight each 
-
 	$('.detailImageRating .hud-imageRating').removeClass("active-rating");
 	$('.detailImageRating .hud-imageRating').each(function(index) {
 		if ($(this).data('rating') <= rating) {
 			$(this).addClass("active-rating");
 		}
+	});
+
+	// update tags
+	var metaDataHUD = $('.itemViewMetaDataHUD')[0];
+	var tagsList = $('#itemViewTagsList');
+	var tagsHTMLAy = [];
+	for (var i = 0; i < applocation.item.tags.length; ++i ) {
+		let liHTML = `
+			<li>
+				<div style="display:flex;align-items:center">
+					<div style="flex:1;">${applocation.item.tags[i]}</div>
+					<div data-tag="${applocation.item.tags[i]}" data-tag-idx="${i}" data-rel="tag-del" data-role="button" data-icon="minus" data-iconpos="notext"
+					class="tag-delete ui-btn ui-icon-minus ui-btn-icon-notext ui-shadow ui-corner-all"
+					></div>
+				</div>
+			</li>
+		`;
+		tagsHTMLAy.push(liHTML);
+	}
+
+	tagsList.empty();
+	tagsList.html(tagsHTMLAy.join("\n"));
+
+	$(metaDataHUD).find('a[data-rel="tag-add"]').click(function(event) {
+	});
+
+	$(tagsList).find('div[data-rel="tag-del"]').click(function(event) {
+		const tagValue = $(this).data('tag');
+		// delete the tag to server
+		// on complete, refresh tags and cached item metadata widget
+		const applocation = appstate.getLocation();
+		gPhotoTimeAPI.deleteTag(applocation.item.id, tagValue).then((res) => {
+			// done deleting tag
+			// now update ui and metadata..
+			if (applocation.item.id === appstate.getLocation().item.id) {
+				var curTags = applocation.item.tags;
+				for (let tagIdx =0; tagIdx< curTags.length; ++tagIdx) {
+					if (curTags[tagIdx] === tagValue) {
+						applocation.item.tags.splice(tagIdx, 1);
+						break;
+					}
+				}
+
+				itemViewPage.onMetadataUpdated();
+			}
+		});
 	});
 }
 
@@ -376,6 +449,11 @@ itemViewPage.loadMetadata = function(imgId, item)
 					applocation.item.metadata = metadata;
 					applocation.item.metadataLoaded = true;
 					applocation.item.rating = metadata.Rating;
+					applocation.item.tags = [];
+					if (metadata.Keywords) {
+						applocation.item.tags = metadata.Keywords.split(",");
+						console.log(applocation.item.tags);
+					}
 					itemViewPage.onMetadataUpdated();
 				}
 			}

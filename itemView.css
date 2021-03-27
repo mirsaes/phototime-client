@@ -1,3 +1,70 @@
+.detailImage 
+{
+    object-fit: contain;
+    max-width: 100%;
+}
+
+.detailImageHUD 
+{
+    position:absolute;
+    top:0px;
+    background-color:white; 
+    opacity:0.5    
+}
+
+.itemViewMetaDataHUD
+{
+    position: absolute;
+    right: 12pt;
+    padding-right: 12pt;
+    padding-left: 12pt;
+    opacity: 0.5;
+    background-color: white;
+}
+
+#itemViewTagsList
+{
+    list-style-type: none;
+    padding-inline-start: 0px;
+
+}
+#itemViewTagsList header
+{
+    text-align: center;
+}
+
+.tag-delete
+{
+    margin-left: 6pt;
+}
+
+.detailImageRating
+{
+    display: flex;
+    flex-grow: 0;
+    user-select: none;
+}
+
+.detail-item-content 
+{
+    padding: 0;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+#ratingPopup {
+    display: flex;
+}
+a.active-rating::after
+{
+    background-color: yellow;
+}
+
+a.hud-imageRating.active-rating::after
+{
+    background-color: yellow;
+}
+
 .navbar-horizontal a {
     margin-left: 4pt;
 }

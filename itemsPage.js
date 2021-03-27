@@ -87,8 +87,6 @@ function renderEmptyFolderGroup(lvid, listView, group)
 		var applocation = appstate.getLocation();
 		gConx.delItem(photoid, {
 			onSuccess: function(data) {
-				//console.log('deleted item: ' + photoid);
-				//console.log(data);
 				var parent = applocation.parents[applocation.parents.length-1];
 
 				app.removeItemFromParentById(photoid);
@@ -161,8 +159,9 @@ function renderGroup(lvid, group, cbks)
 	
 	var gConx = gPhotoTimeAPI.getConnection();
 
-	// TODO: need to "page" through these thumbs as loading all these images takes a long time
-	// or lazy load more
+	// TODO: need to "page" through these thumbs as loading
+	// when directory has a lot of images takes a long time
+	// or ... lazy load more, TBD
 	// maybe set timeout to load more? would that help
 	//var maxLoadItems = Math.min(100, items.length);
 	const maxLoadItems = items.length;
