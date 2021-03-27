@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>PhotoTime</title>
+		<script>
+			if (typeof app == 'undefined')
+				window.location="index.html";
+		</script>
+	</head>
+	<body>
+		<div data-role="page" id="imageEditPage" name="itemView">
+			<div id="mycontent" data-role="content">
+				<div id="imageEditContainer" class="fitImageContainer">
+					<div id="imageEditHolder" class="fitImageHolder">
+						<img id="imageEdit" class="fitImage"  src="" alt="the image to edit"/>
+					</div>
+				</div>
+			</div>
+			<div data-role="popup" id="aspectRatioPopup" >
+				<a href="imageEdit.html" data-role="button" data-aspect="free" data-rel="aspectRatioOption" class="aspectRatioOption">free</a>
+				<a href="imageEdit.html" data-role="button" data-aspect="5x7" data-rel="aspectRatioOption" class="aspectRatioOption">5x7</a>
+				<a href="imageEdit.html" data-role="button" data-aspect="4x6" data-rel="aspectRatioOption" class="aspectRatioOption">4x6</a>
+				<a href="imageEdit.html" data-role="button" data-aspect="7x5" data-rel="aspectRatioOption" class="aspectRatioOption">7x5</a>
+				<a href="imageEdit.html" data-role="button" data-aspect="6x4" data-rel="aspectRatioOption" class="aspectRatioOption">6x4</a>
+				<a href="imageEdit.html" data-role="button" data-aspect="8x10" data-rel="aspectRatioOption" class="aspectRatioOption">8x10</a>
+				<a href="imageEdit.html" data-role="button" data-aspect="10x8" data-rel="aspectRatioOption" class="aspectRatioOption">10x8</a>
+			</div>
+				<div data-role="footer" data-position="fixed">
+				<div data-role="navbar" data-iconpos="notext">
+					<a href="items.html#items" data-role="button" data-rel="back" data-icon="back" >Back</a>
+					<a href="#aspectRatioPopup" data-role="button" data-rel="popup" data-icon="phototime-aspect-select" title="selection constraint">Aspect Ratio</a>
+					<a href="items.html#items" data-role="button" data-rel="crop" data-icon="phototime-crop" title="crop">Crop</a>
+				</div>
+			</div>			
+        </div>
+
+    </body>
+</html>

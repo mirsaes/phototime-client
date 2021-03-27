@@ -1,0 +1,11 @@
+**/.env
+.dockerignore
+docker/Dockerfile
+docker/docker-compose.yml
+docker/sample.env
+.git
+.gitignore
+package-lock.json
+
+node_modules/**
+!node_modules/cropperjs/dist/**

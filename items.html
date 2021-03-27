@@ -1,41 +1,14 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 	<head>
-
-		<meta name="viewport" content="width=device-width, initial-scale=1"> 
-		<link rel="stylesheet" href="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
-		<link rel="stylesheet" href="phototime.css" />
-		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
-		<script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
-		<script src="serverDataSource.js"></script>
-		<script src="serversList.js"></script>
-		<script src="api/photoTimeApi.js"></script>
-		<script src="model/repos.js"></script>
-		<script src="splashPage.js"></script>
-		<script src="reposPage.js"></script>
-		<script src="repoPage.js"></script>
-		<script src="itemsPage.js"></script>
-		<script src="app.js"></script>
-		<script src="itemViewPage.js"></script>
+		<title>PhotoTime</title>
 		<script>
-			(function( $ ) {
-				// On document ready
-				$(function() {
-					//reloadServers('splashServers');
-				});
-			})( jQuery);	
+			if (typeof app == 'undefined')
+				window.location="index.html";
 		</script>
-		<title></title>
 	</head>
 	<body>
 		<div data-role="page" id="items" name="items">
-<script>
-
-	
-	$("#items").on('pagebeforeshow',function() {		
-		itemsPage.loadItems();
-	});
-</script>
 			<div data-role="header" data-position="fixed">
 				<h1>Photo Time</h1>
 			</div>
@@ -45,8 +18,9 @@
 			</div>
 			
 			<div data-role="footer" data-position="fixed">
-				<div data-role="navbar" data-iconpos="notext">
-					<a href="repo.html#repo" data-role="button" data-rel="back" data-icon="back"></a>
+				<div data-role="navbar" class="navbar-horizontal" data-iconpos="notext">
+					<a href="repo.html#repo" data-role="button" data-rel="custom-back" data-icon="back"></a>
+					<div id="items-page-status-text" class="items-page-status">Checking Thumb Status</div>
 				</div>
 			</div>
 		</div>

@@ -1,59 +1,36 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 	<head>
-
+		<title>PhotoTime</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1"> 
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.css" />
+		<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+		<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
 		<link rel="stylesheet" href="phototime.css" />
-		<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 		<script>
 			$(document).bind("mobileinit", function(){
 			  $.mobile.defaultPageTransition="none"
-			});		
+			});
 		</script>
-		<script src="https://code.jquery.com/mobile/1.3.2/jquery.mobile-1.3.2.min.js"></script>
-		<script src="serverDataSource.js"></script>
-		<script src="serversList.js"></script>
-		<script src="api/photoTimeApi.js"></script>
-		<script src="model/repos.js"></script>
-		<script src="splashPage.js"></script>
-		<script src="reposPage.js"></script>
-		<script src="repoPage.js"></script>
-		<script src="app.js"></script>
-		<script src="itemsPage.js"></script>
-		<script src="itemViewPage.js"></script>
-		<script>
-			(function( $ ) {
-				// On document ready
-				$(function() {
-					//reloadServers('splashServers');
-					app.connectBack();
-				});
-			})( jQuery);
-		</script>
-		<title></title>
+		<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+		<script type="module" src="./serverDataSource.js"></script>
+		<script type="module" src="./serversList.js"></script>
+		<script type="module" src="./api/photoTimeApi.js"></script>
+		<script type="module" src="./repoDataSource.js"></script>
+		<script type="module" src="model/repos-list.js"></script>
+		<script type="module" src="./splashPage.js"></script>
+		<script type="module" src="./reposPage.js"></script>
+		<script type="module" src="./repoPage.js"></script>
+		<script type="module" src="app.js"></script>
+		<script type="module" src="itemsPage.js"></script>
+		<script type="module" src="itemViewPage.js"></script>
+		<link rel="stylesheet" href="itemView.css">
+		<link  href="node_modules/cropperjs/dist/cropper.css" rel="stylesheet">
+		<script src="node_modules/cropperjs/dist/cropper.js"></script>	
+		<script src="node_modules/panzoom/dist/panzoom.js"></script>	
+		<script type="module" src="./imageEditPage.js"></script>
 	</head>
 	<body>
 		<div data-role="page" id="splash" name="splash">
-<script>
-$(document).bind("mobileinit", function(){
-  $.mobile.defaultPageTransition="none"
-});
-	var gConx;
-	$("#splash").on('pageinit', function() {
-		console.log('splash pageinit');
-	});
-	$("#splash").on('pageshow', function() {
-		console.log('splash pageshow');
-	});
-	$("#splash").on('pagebeforechange', function() {
-		console.log("splash - pagebeforechange");
-	});
-	
-	$("#splash").on('pagebeforeshow',function() {
-		splashPage.loadServers();
-	});
-</script>
 			<div data-role="header" data-position="fixed">
 				<h1>Photo Time</h1>
 			</div>

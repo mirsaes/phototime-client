@@ -1,29 +1,39 @@
+import { gRepos } from './repoDataSource.js'
+import { appstate } from './appstate.js'
+import { gPhotoTimeAPI} from './api/photoTimeApi.js'
+import { renderRepo } from './model/repos-list.js'
+
 var repoPage = {
 };
 
 repoPage.loadRepo = function() {
-	var repo = gRepos[app.location.repoIdx];
+	var repo = gRepos.getRepo(appstate.getLocation().repoIdx);
 	
 	var onGroupItemAvail = function(item, items)
 	{
-		app.location.parents.push(repo);
-		app.location.item = item;
+		var applocation = appstate.getLocation();
+		applocation.parents.push(repo);
+		applocation.item = item;
 		//app.location.parents = [];//?
 		item.items = items;
 		$.mobile.changePage('items.html#items');
 	};
 	
-	loadRepo('repoItemsList', repo, {
+	var gConx = gPhotoTimeAPI.getConnection();
+	
+	renderRepo('repoItemsList', repo, gConx, {
 		onSelect: function(idx)
 		{
-			console.log('repo item selected idx: ' + idx);
+			var applocation = appstate.getLocation();
+			
 			repo.selectedItemIdx = idx;
 			var item = repo.items[idx];
-			
+
+			console.log(`repo item selected. idx=${idx}. type=${item.type}. id=${item.id}`);
 			if (item.type == "file")
 			{
-				app.location.parents.push(repo);
-				app.location.item = item;
+				applocation.parents.push(repo);
+				applocation.item = item;
 				$.mobile.changePage('itemView.html#itemView');
 			} else {
 				if (item.items) {
@@ -40,3 +50,9 @@ repoPage.loadRepo = function() {
 		}
 	});
 }
+
+$(document).on('pagebeforeshow', "#repo", function() {
+	repoPage.loadRepo();
+});
+
+export { repoPage }
