@@ -53,7 +53,7 @@ class PhotoTimeApp
 		{
 			ret.nextPopCount = 0;
 			ret.next = adj.next;
-		} else {
+		} else if (grandParent) {
 			console.log('next parent.length=' + applocation.parents.length);
 			// find parents siblings .. this could go beyond one folder depth..?
 			var adjItems = this.getAdjItems(grandParent.items, parent);
@@ -68,8 +68,9 @@ class PhotoTimeApp
 		if (adj.prev) {
 			ret.prevPopCount = 0;
 			ret.prev = adj.prev;
-		} else {
+		} else if (grandParent) {
 			console.log('prev parent.length=' + applocation.parents.length);
+			
 			var adjItems = this.getAdjItems(grandParent.items, parent);
 			
 			if (adjItems.prev) {

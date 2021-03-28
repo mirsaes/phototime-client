@@ -8,7 +8,8 @@ class PhotoTimeConnection
 	
 	}
 
-	getRepo(repoId, cbks) {
+	getRepo(repoId, cbks) 
+	{
 		// old skool
 		var req = this.createRequest(this.urlRoot + '/repo/' + repoId, cbks);
 		req();
@@ -68,20 +69,47 @@ class PhotoTimeConnection
 			Promise.reject("failure");
 		});
 	}
+
+	async addTag(itemId, tagValue)
+	{
+		var url = `${this.urlRoot}/metadata/${itemId}`;
+		return $.ajax({
+			type:"POST",
+			url: url,
+			data: JSON.stringify({"tags":[tagValue]}),
+			dataType: 'json',
+			contentType: "application/json; charset=utf-8"
+		}).done(function(data, textStatus, jqXHR){
+			Promise.resolve(data);
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			//console.warn("failed" + textStatus + " " + errorThrown);
+			console.warn("failed to add tag");
+			Promise.reject("failure");
+		});
+	}
 	
+	async deleteTag(itemId, tagValue)
+	{
+		var url = `${this.urlRoot}/metadata/${itemId}`;
+		return $.ajax({
+			type:"DELETE",
+			url: url,
+			data: JSON.stringify({"tags":[tagValue]}),
+			dataType: 'json',
+			contentType: "application/json; charset=utf-8"
+		}).done(function(data, textStatus, jqXHR){
+			Promise.resolve(data);
+		}).fail(function(jqXHR, textStatus, errorThrown) {
+			//console.warn("failed" + textStatus + " " + errorThrown);
+			console.warn("failed to delete tag");
+			Promise.reject("failure");
+		});
+
+	}
+
 	rateItem(itemId, rating, cbks) {
 		//var url = `${this.urlRoot}/item/${itemId}?rating=${rating}`;
 		var url = `${this.urlRoot}/item/${itemId}`;
-		/*
-		$.post(
-			url,
-			JSON.stringify({'rating':rating})
-			, function(data, status, jqXHR) {
-				console.log(status);
-	
-			}		
-		);
-		*/
 		$.ajax({
 			type: "POST",
 			url: url,
@@ -134,8 +162,12 @@ class PhotoTimeConnection
 	}
 }
 
-var gPhotoTimeAPI = (function() {
-	var createRequest = function(url, cbks) {
+class PhototimeAPI 
+{
+	activeConnection = null;
+
+	createRequest(url, cbks) 
+	{
 		var getRepos = function() {
 			var ajax = $.ajax({
 				//url: 'http://' + server.ipAddress + ':' + server.port + '/' + 'repos'
@@ -158,19 +190,32 @@ var gPhotoTimeAPI = (function() {
 		};
 		
 		return getRepos;
-	};
+	}
+	
+	
+	connect(server)
+	{
+		this.activeConnection = new PhotoTimeConnection(server, this.createRequest);
+		return this.activeConnection;
+	}
 
-	var activeConnection = null;
+	getConnection() 
+	{
+		return this.activeConnection;
+	}
 
-	return {
-		connect: function(server) {
-			activeConnection = new PhotoTimeConnection(server, createRequest);
-			return activeConnection;
-		},
-		getConnection: function() {
-			return activeConnection
-		}
-	};
-})();
+	async deleteTag(itemId, tagValue)
+	{
+		return this.activeConnection.deleteTag(itemId, tagValue);
+	}
+
+	async addTag(itemId, tagValue) 
+	{
+		return this.activeConnection.addTag(itemId, tagValue);
+	}
+
+}
+
+var gPhotoTimeAPI = new PhototimeAPI();
 
 export { gPhotoTimeAPI }

@@ -1,0 +1,21 @@
+/* specify so takes full space*/
+div#imageEditPage {
+    display:flex;
+    flex-direction: column;
+}
+
+img#imageEdit
+{
+    width: 100%;
+    display: block;
+}
+
+.ui-icon-phototime-crop:after {
+	background-image: url("assets/crop.svg");
+    background-size: contain;
+}
+
+.ui-icon-phototime-aspect-select:after {
+	background-image: url("assets/aspect-select.svg");
+    background-size: contain;
+}
