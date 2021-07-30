@@ -11,77 +11,14 @@ class PhotoTimeApp
 	removeItemFromParentById(itemid)
 	{
 		var applocation = appstate.getLocation();
-		var parent = applocation.parents[applocation.parents.length-1]
-		var idx = 0;
-		var items = parent.items;
-		for (idx = 0; idx < items.length; ++idx) {
-			let item = items[idx];
-			if (item.id == itemid) {
-				parent.items.splice(idx, 1);
-				return true;
-			}
-		}
-		
-		return false;
+		return applocation.removeItemFromParentById(itemid);
 	}
 	 
 	removeItemFromParent(item, idx) {
 		var applocation = appstate.getLocation();
-		var parent = applocation.parents[applocation.parents.length-1]
-		
-		var delItem = parent.items[idx];
-		if (delItem.id == item.id) {
-			// remove 1
-			parent.items.splice(idx, 1);
-			return true;
-		}
-		return false;
+		applocation.removeItemFromParent(item, idx);
 	}
 	
-	// {nextPopCount: 1, nextParent, next: item, prevPopCount: 0, prevParent: null, prev: item}
-	// {nextPopCount: 1, parentsNextSibling, next: item, prevPopCount: 0, parentsPrevSibling: null, prev: item}
-	getAdjNav(item)
-	{
-		var ret = {};
-		var applocation = appstate.getLocation();
-		
-		var adj = this.getAdjSiblings(item);
-		var parent = applocation.parents[applocation.parents.length-1];
-		var grandParent = applocation.parents[applocation.parents.length-2]
-		
-		if (adj.next)
-		{
-			ret.nextPopCount = 0;
-			ret.next = adj.next;
-		} else if (grandParent) {
-			console.log('next parent.length=' + applocation.parents.length);
-			// find parents siblings .. this could go beyond one folder depth..?
-			var adjItems = this.getAdjItems(grandParent.items, parent);
-			
-			if (adjItems.next) {
-				ret.nextPopCount = 1;
-				ret.parentsNextSibling = adjItems.next;
-				//ret.next = adjItems.next.items[0];
-			}
-		}
-		
-		if (adj.prev) {
-			ret.prevPopCount = 0;
-			ret.prev = adj.prev;
-		} else if (grandParent) {
-			console.log('prev parent.length=' + applocation.parents.length);
-			
-			var adjItems = this.getAdjItems(grandParent.items, parent);
-			
-			if (adjItems.prev) {
-				ret.prevPopCount = 1;
-				ret.parentsPrevSibling = adjItems.prev;
-				//ret.prev = adjItems.prev.items[adjItems.prev.items.length-1]
-			}
-		}
-		return ret;
-	}
-
 	getItemIdx(items, item)
 	{
 		var idx;
@@ -99,41 +36,16 @@ class PhotoTimeApp
 	// {prev: item, next: item, idx: itemsIdx}
 	getAdjItems(items, item)
 	{
-		var adjItems = {};
-		var idx;
-		for (idx = 0; idx < items.length; ++idx)
-		{
-			let aitem = items[idx];
-			if (aitem.id == item.id) {
-				if (idx > 0)
-					adjItems.prev = items[idx-1];
-				if (idx + 1 < items.length)
-					adjItems.next = items[idx+1];
-				
-				adjItems.idx = idx;
-				break;
-			}
-		}
-		
-		return adjItems;
+		var applocation = appstate.getLocation();
+		return applocation.getAdjItems(items, item);
 	}
 	
 	// @return {prev: item, next: item, idx: itemsIndex}
 	// may be undefined prev, next
 	getAdjSiblings(item)
 	{
-		// find item id in parent
 		var applocation = appstate.getLocation();
-		var parent = applocation.parents[applocation.parents.length-1]
-		var items = parent.items;
-		
-		var idx = 0;
-		var adjSiblings = {};
-		//adjSiblings.prev;
-		//adjSiblings.next;
-		adjSiblings = this.getAdjItems(items, item);
-		
-		return adjSiblings;
+		return applocation.getAdjSiblings();
 	}
 	
 	connectBack()
@@ -165,20 +77,8 @@ class PhotoTimeApp
 	}
 	
 	doBack() {
-		// pop parent
-		var applocation = appstate.getLocation();
-		if (applocation.parents.length == 0) {
-			if (applocation.repoIdx >= 0) {
-				applocation.repoIdx=-1;
-			} else {
-				applocation.serverIdx = -1;
-			}
-		} else {
-			// within repo still
-			var group = applocation.parents.pop();
-			applocation.item = group;
-		}
-
+		//var applocation = appstate.getLocation();
+		appstate.back();
 	}
 }
 
