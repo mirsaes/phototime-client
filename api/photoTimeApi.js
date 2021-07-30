@@ -57,92 +57,78 @@ class PhotoTimeConnection
 	
 	async loadMetadata(itemId, cbks) {
 		var url = `${this.urlRoot}/metadata/${itemId}`;
-		return $.ajax({
-			type:"GET",
-			url: url,
-			contentType: "application/json; charset=utf-8"
-		}).done(function(data, textStatus, jqXHR){
-			Promise.resolve(data);
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			//console.warn("failed" + textStatus + " " + errorThrown);
-			console.warn("failed to load metadata");
-			Promise.reject("failure");
-		});
+		try {
+			const result = await $.ajax({
+				type:"GET",
+				url: url,
+				contentType: "application/json; charset=utf-8"
+			});
+			return result;
+		} catch (error) {
+			console.log('error');
+			throw error;
+		}
 	}
 
 	async addTag(itemId, tagValue)
 	{
 		var url = `${this.urlRoot}/metadata/${itemId}`;
-		return $.ajax({
-			type:"POST",
-			url: url,
-			data: JSON.stringify({"tags":[tagValue]}),
-			dataType: 'json',
-			contentType: "application/json; charset=utf-8"
-		}).done(function(data, textStatus, jqXHR){
-			Promise.resolve(data);
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			//console.warn("failed" + textStatus + " " + errorThrown);
-			console.warn("failed to add tag");
-			Promise.reject("failure");
-		});
+		try {
+			const result = await $.ajax({
+				type:"POST",
+				url: url,
+				data: JSON.stringify({"tags":[tagValue]}),
+				dataType: 'json',
+				contentType: "application/json; charset=utf-8"
+			});
+			return result;
+		} catch (error) {
+			throw error;
+		}
 	}
 	
 	async deleteTag(itemId, tagValue)
 	{
 		var url = `${this.urlRoot}/metadata/${itemId}`;
-		return $.ajax({
-			type:"DELETE",
-			url: url,
-			data: JSON.stringify({"tags":[tagValue]}),
-			dataType: 'json',
-			contentType: "application/json; charset=utf-8"
-		}).done(function(data, textStatus, jqXHR){
-			Promise.resolve(data);
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			//console.warn("failed" + textStatus + " " + errorThrown);
-			console.warn("failed to delete tag");
-			Promise.reject("failure");
-		});
-
+		try {
+			return await $.ajax({
+				type:"DELETE",
+				url: url,
+				data: JSON.stringify({"tags":[tagValue]}),
+				dataType: 'json',
+				contentType: "application/json; charset=utf-8"
+			});
+		} catch (error) {
+			throw error;
+		}
 	}
 
-	rateItem(itemId, rating, cbks) {
+	async rateItem(itemId, rating, cbks) {
 		//var url = `${this.urlRoot}/item/${itemId}?rating=${rating}`;
 		var url = `${this.urlRoot}/item/${itemId}`;
-		$.ajax({
-			type: "POST",
-			url: url,
-			data: JSON.stringify({"rating":rating})
-			, dataType: 'json'
-			, contentType: "application/json; charset=utf-8"
-		}).done(function(data, textStatus, jqXHR){
-			console.log('ajax success');
-			if (cbks.onSuccess)
-				cbks.onSuccess(data);
-		}).fail(function(jqXHR, textStatus, errorThrown){
-			console.log('ajax FAILED');
-			if (cbks.onError)
-				cbks.onError(jqXHR);
-		}).always(function() {
-			console.log('finished rating');
-		});
+		try {
+			return await $.ajax({
+				type: "POST",
+				url: url,
+				data: JSON.stringify({"rating":rating})
+				, dataType: 'json'
+				, contentType: "application/json; charset=utf-8"
+			});
+	
+		} catch (error) {
+			throw error;
+		}
 	}
 
 	async cropImage(itemId, cropParams)
 	{
 		var url = `${this.urlRoot}/imageedit/crop/${itemId}`;
-		return $.ajax({
+		return await $.ajax({
 			type:"PUT",
 			url: url,
 			data: JSON.stringify(cropParams),
 			dataType: 'json', 
 			contentType: "application/json; charset=utf-8"
-		}).done(function(data, textStatus, jqXHR){
-			Promise.resolve(data);
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			console.warn(`failed to crop image: ${itemId}`);
-			Promise.reject("failure");
 		});		
 	}
 
@@ -150,14 +136,9 @@ class PhotoTimeConnection
 	{
 		var url = `${this.urlRoot}/status/thumbs`;
 
-		return $.ajax({
+		return await $.ajax({
 			type:"GET",
 			url: url,
-		}).done(function(data, textStatus, jqXHR){
-			Promise.resolve(data);
-		}).fail(function(jqXHR, textStatus, errorThrown) {
-			console.warn('failed to check thumb status');
-			//Promise.reject('failure');
 		});
 	}
 }

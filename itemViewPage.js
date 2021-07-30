@@ -270,7 +270,7 @@ itemViewPage.beforeShow = function()
 		// TODO: show popup of rating.. 5 stars
 		var rating = $(this).data('rating');
 		var gConx = gPhotoTimeAPI.getConnection();
-		gConx.rateItem(photoid, rating, {onSuccess: function() {
+		gConx.rateItem(photoid, rating, null).then(() => {
 			//console.log(`todo toast, rated item ${rating} ${photoid}`);
 			if (photoid === applocation.item.id) {
 				$('#ratingPopup a.rateItem').removeClass("active-rating");
@@ -282,7 +282,9 @@ itemViewPage.beforeShow = function()
 					itemViewPage.onMetadataUpdated();
 				}
 			}
-		}});
+		}).catch ((reason) => {
+			console.log('drat, rating failed');
+		});
 	});
 
 	$('#new-tag-save').unbind('click');
@@ -308,6 +310,8 @@ itemViewPage.beforeShow = function()
 
 				itemViewPage.onMetadataUpdated();
 			}
+		}).catch((reason) => {
+			console.log('sorry');
 		});
 	});
 
@@ -457,8 +461,8 @@ itemViewPage.loadMetadata = function(imgId, item)
 					itemViewPage.onMetadataUpdated();
 				}
 			}
-		}).catch((reason) => {
-			console.log('failed');
+		}).catch(reason => {
+				console.log('failed');
 		});
 	} else {
 		itemViewPage.onMetadataUpdated();
