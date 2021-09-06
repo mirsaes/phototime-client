@@ -34,6 +34,10 @@ To serve multiple repositories, either run multiple instances of mirsaes/phototi
     * cropping
     * tagging
 
+# Known Issues
+* 2021.09.05
+  * After crop, new file is not visible until refresh
+
 # Version History
 * 2021.03.27 - your it
   * WIP tagging support

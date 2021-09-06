@@ -4,175 +4,177 @@ import { app } from './app.js'
 
 var itemViewPage = {};
 
-itemViewPage.updateToPrev = function(adjNav, items) {
+// modifies location to update "ancestorSibling" with items
+// makes ancesestorSibling the parent
+// sets item to be either first child or last child based on
+// whether navigated from prev (last) or next (first)
+itemViewPage.updateNavToParent = function(adjNav, items, isFirst)
+{
 	var applocation = appstate.getLocation();
 	applocation.item = null;
-	adjNav.parentsPrevSibling.items = items;
+	adjNav.ancestorSibling.items = items;
 	
 	var popIdx;
-	for (popIdx = 0; popIdx < adjNav.prevPopCount; ++popIdx) {
+	for (popIdx = 0; popIdx < adjNav.popCount; ++popIdx) {
 		applocation.parents.pop();
 	}
 	
-	applocation.parents.push(adjNav.parentsPrevSibling);
-	applocation.item = adjNav.parentsPrevSibling.items[adjNav.parentsPrevSibling.items.length-1];
-	// turn off loading
-	itemViewPage.beforeShow();
+	applocation.parents.push(adjNav.ancestorSibling);
+	var itemIdx = (isFirst?0:adjNav.ancestorSibling.items.length-1);
+	applocation.item = adjNav.ancestorSibling.items[itemIdx];
+}
+
+itemViewPage.updateToPrev = function(adjNav, items) {
+	itemViewPage.updateNavToParent(adjNav, items, false);
 };
 
 itemViewPage.updateToNext = function(adjNav, items) {
-	var applocation = appstate.getLocation();
-	applocation.item = null;
-	adjNav.parentsNextSibling.items = items;
-	
-	var popIdx;
-	for (popIdx = 0; popIdx < adjNav.nextPopCount; ++popIdx) {
-		applocation.parents.pop();
-	}
-	
-	applocation.parents.push(adjNav.parentsNextSibling);
-	applocation.item = adjNav.parentsNextSibling.items[0];
-	// turn off loading
-	itemViewPage.beforeShow();
+	itemViewPage.updateNavToParent(adjNav, items, true);
 };
 
-itemViewPage.onSwipeFunction = function(event, swipeDirection) {
+itemViewPage.processNavRequest = function(directionContext)
+{
+	// TODO: intro promise or async await so that can then call before show
 	var applocation = appstate.getLocation();
-	var item = applocation.item;
-
-	//console.log('swiped ' + direction);
-	//console.log(event);
-	var adjSiblings = app.getAdjSiblings(item);
-
-	if (swipeDirection == "left") {
-		// swipe left would pull in from right
-		if (adjSiblings.next) {
-			applocation.item = adjSiblings.next;
+	// find next
+	//  traverse file "tree" if have to
+	//applocation.next()
+	if (directionContext.siblingItem) {
+		if (directionContext.siblingItem.type == 'file') {
+			applocation.item = directionContext.siblingItem;
 			itemViewPage.beforeShow();
-			return;
-		}
-		
-		// no more siblings, try to go to parent's sibling's next item
-		var adjNav = app.getAdjNav(item);
-		if (adjNav.parentsNextSibling && adjNav.nextPopCount > 0) {
-			//console.log(adjNav);
+		} else {
+			// its a folder
+			if (directionContext.siblingItem.items) {
+				// items loaded, so
+				applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
+				applocation.parents.push(directionContext.siblingItem);
+				itemViewPage.beforeShow();
+			} else {
+				// items not loaded so need to load
+				var gConx = gPhotoTimeAPI.getConnection();
+
+				gConx.getItems(directionContext.siblingItem.id, {
+					onSuccess: function(data) {
+						var jData = data;
+						if (jData.items && jData.items.length) {
+							// items now loaded, so...
+							//applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
+							//applocation.parents.push(directionContext.siblingItem);
+							directionContext.siblingItem.items = jData.items;
+							applocation.item = directionContext.siblingItem.items[directionContext.useFirst?0:directionContext.siblingItem.items.length-1];
+							applocation.parents.push(directionContext.siblingItem);
+							itemViewPage.beforeShow();
 			
-			if (adjNav.next) {
+							//itemViewPage.updateToPrev(adjNav, jData.items);
+						} else {
+							// just show it as an item
+							applocation.item = directionContext.siblingItem;
+							itemViewPage.beforeShow();
+						}
+					}
+				});
+			}
+		}
+		return;
+	}
+	
+	// no more siblings, try to go to parent's sibling's next item
+	// the parent's sibling might be "empty", so repeat?, nah, show empty folder..
+	//if no applocation.item.., that means empty folder and trying to go next
+	if (!applocation.item) {
+		// parent is the folder being examined, so go up and to next sibling
+		// if no next sibling, repeat up and to next sibling
+	}
+	var adjNav = directionContext.getNextOrPrev(applocation.item);
+	if (adjNav.ancestorSibling && adjNav.popCount > 0) {
+		if (adjNav.item) {
+			if (adjNav.item.type == 'file') {
 				// set next item (should be file)
 				// and update to appropriate "new" parent
-				applocation.item = adjNav.next;
+				applocation.item = adjNav.item;
 				
 				var popIdx;
-				for (popIdx = 0; popIdx < adjNav.nextPopCount; ++popIdx) {
+				for (popIdx = 0; popIdx < adjNav.popCount; ++popIdx) {
 					applocation.parents.pop();
 				}
 				// assuming this is a folder
-				applocation.parents.push(adjNav.parentsNextSibling);
-			} else if (adjNav.parentsNextSibling.type == 'file') {
-				// set the item
-				applocation.item = adjNav.parentsNextSibling;
-				// remove parents until sibling's parent is on stack
-				var popIdx;
-				for (popIdx = 0; popIdx < adjNav.nextPopCount; ++popIdx) {
-					applocation.parents.pop();
-				}
-				// no need to push the parentsNextSibling, since it is a an item, not a parent
-				// turn off loading
-				itemViewPage.beforeShow();
-
-			} else if (!adjNav.parentsNextSibling.items){
-				// need to ajax items
-				//console.log("TODO: set page loading");
-				var gConx = gPhotoTimeAPI.getConnection();
-				gConx.getItems(adjNav.parentsNextSibling.id, {
-					onSuccess: function(data) {
-						var jData = data;
-						// next could either be in a sibling folder
-						// or have to use its parent folder..
-						console.log(jData.info.type);
-						if (jData.info.type == 'file') {
-							console.log('todo: ');
-
-						} else {
-							itemViewPage.updateToNext(adjNav, jData.items);
-						}
-					}
-				});
+				applocation.parents.push(adjNav.ancestorSibling);
 			} else {
-				itemViewPage.updateToNext(adjNav, adjNav.parentsNextSibling.items);
+				// its a folder, might be empty etc
+				console.log(adjNav.item);
 			}
-		}
-	} else if (swipeDirection == "right") {
-		// swipe right would pull in from left
-		if (adjSiblings.prev) {
-			if (adjSiblings.prev.type == 'file') {
-				applocation.item = adjSiblings.prev;
-				itemViewPage.beforeShow();
-				return;
-			} else {
-				// its a folder..
-				console.log(adjSiblings.prev);
-				if (adjSiblings.prev.items) {
-					// items loaded, so 
-					applocation.item = adjSiblings.prev.items[adjSiblings.prev.items.length-1];
-					applocation.parents.push(adjSiblings.prev);
-					itemViewPage.beforeShow();
-					return;
-				} else {
-					var gConx = gPhotoTimeAPI.getConnection();
+			itemViewPage.beforeShow();
+		} else if (adjNav.ancestorSibling.type == 'file') {
+			// set the item
+			applocation.item = adjNav.ancestorSibling;
+			// remove parents until sibling's parent is on stack
+			var popIdx;
+			for (popIdx = 0; popIdx < adjNav.popCount; ++popIdx) {
+				applocation.parents.pop();
+			}
+			// no need to push the ancestorSibling, since it is a an item, not a parent
+			// turn off loading
+			itemViewPage.beforeShow();
+		} else if (!adjNav.ancestorSibling.items){
+			// need to ajax items
+			//console.log("TODO: set page loading");
+			var gConx = gPhotoTimeAPI.getConnection();
+			gConx.getItems(adjNav.ancestorSibling.id, {
+				onSuccess: function(data) {
+					var jData = data;
+					// next could either be in a sibling folder
+					// or have to use its parent folder..
+					console.log(jData.info.type);
+					if (jData.info.type == 'file') {
+						console.log('todo: ');
 
-					gConx.getItems(adjSiblings.prev.id, {
-						onSuccess: function(data) {
-							var jData = data;
-							if (jData.items && jData.items.length) {
-								
-								//itemViewPage.updateToPrev(adjNav, jData.items);
-							} else {
-								// just show it as an item
-								applocation.item = adjSiblings.prev;
-								itemViewPage.beforeShow();
-							}
-						}
-					});
-						
-				}
-			}
-		}
-		// no more siblings, try to go to parent's sibling's next item
-		var adjNav = app.getAdjNav(item);
-		if (adjNav.parentsPrevSibling && adjNav.prevPopCount > 0) {
-			
-			if (adjNav.prev) {
-				if (adjNav.prev.type == 'file') {
-					applocation.item = adjNav.prev;
-					
-					var popIdx;
-					for (popIdx = 0; popIdx < adjNav.prevPopCount; ++popIdx) {
-						applocation.parents.pop();
-					}
-					
-					applocation.parents.push(adjNav.parentsPrevSibling);
-				} else {
-					// its a folder, might be empty, etc
-					console.log(adjNav.prev);
-				}
-			} else if (!adjNav.parentsPrevSibling.items){
-				// need to ajax items
-				//console.log("TODO: set page loading");
-				var gConx = gPhotoTimeAPI.getConnection();
+					} else {
+						directionContext.updateNavFn(adjNav, jData.items);
+						// turn off loading
+						itemViewPage.beforeShow();
 
-				gConx.getItems(adjNav.parentsPrevSibling.id, {
-					onSuccess: function(data) {
-						var jData = data;
-						itemViewPage.updateToPrev(adjNav, jData.items);
 					}
-				});
-			} else {
-				itemViewPage.updateToPrev(adjNav, adjNav.parentsPrevSibling.items);
-			}
+				}
+			});
+		} else {
+			directionContext.updateNavFn(adjNav, adjNav.ancestorSibling.items);
+			// turn off loading
+			itemViewPage.beforeShow();
 		}
 	}
-};
+}
+
+itemViewPage.onSwipeFunction = function(event, swipeDirection) 
+{
+	var applocation = appstate.getLocation();
+	var item = applocation.item;
+
+	var adjSiblings = appstate.getAdjSiblings(item);
+
+	var directionContext = {
+		getNextOrPrev: null, // nextNav or prevNav
+		updateNavFn: null,   // updateToNext or updateToPrev
+		siblingItem: null,   // adjSiblings.next or adjSiblings.prev
+		useFirst: null 	     // useFirst=true -> next, otherwise prev
+	};
+
+	if (swipeDirection == "left") {
+		// swipe left would pull in from right
+		directionContext.getNextOrPrev = jQuery.proxy(appstate.getNextNav, appstate);
+		directionContext.updateNavFn = itemViewPage.updateToNext;
+		directionContext.siblingItem = adjSiblings.next;
+		directionContext.useFirst = true;
+	} else {
+		// swipe right would pull in from left
+		directionContext.getNextOrPrev = jQuery.proxy(appstate.getPrevNav, appstate);
+		directionContext.updateNavFn = itemViewPage.updateToPrev;
+		directionContext.siblingItem = adjSiblings.prev;
+		directionContext.useFirst = false; // use last
+	}
+
+	itemViewPage.processNavRequest(directionContext);	
+}
 
 itemViewPage.beforeShow = function()
 {
@@ -189,12 +191,32 @@ itemViewPage.beforeShow = function()
 		//applocation.item = applocation.parents.pop();
 		//$.mobile.changePage('items.html#items');
 		// remove itemView from history
-		var imageDiv = $("#" + nodeId);
-		imageDiv.html("<div>This folder is empty: " + applocation.parents[applocation.parents.length-1].id + "</div>");
+		var imageDiv = $("#" + nodeId)[0];
+		imageDiv.style.display='none';
+		var emptyImageDiv = $("#" + 'emptyImage');
+
+		//var emptyImageDiv = imageDiv$(imageDiv, )
+		emptyImageDiv.html("<div>This folder is empty: " + appstate.getParent().id + "</div>");
+		//delete emptyImageDiv[0].style.display;
+		//emptyImageDiv[0].style.display='default';
+		emptyImageDiv[0].style.display='block';
+		//emptyImageDiv[0].style.visibility='visible';
 		//app.goBack();
 		return;
 	} else {
+		var imageDiv = $("#" + nodeId)[0];
+		imageDiv.style.display='';
+		//imageDiv.style.display='default';
+		//imageDiv.style.visibility='visible';
+		
+		var emptyImageDiv = $("#" + 'emptyImage');
+		emptyImageDiv[0].style.display='none';
+
+		//var emptyImageDiv = imageDiv$(imageDiv, )
+		//emptyImageDiv.style.visibility='hidden';
+
 		// go up chain marking each item as selected
+		// why marking items as selected?
 		var pidx = applocation.parents.length-1;
 		var selItem = item;
 		while (pidx >= 0) {
@@ -328,7 +350,6 @@ itemViewPage.beforeShow = function()
 	$('.prevItem').click(function(event) {
 		var applocation = appstate.getLocation();
 		var item = applocation.item;
-		var photoid = item.id;
 		//console.log('prev Item ' + photoid);
 		onSwipeFunction(event, "right");
 	});
@@ -337,8 +358,6 @@ itemViewPage.beforeShow = function()
 	$('.nextItem').click(function(event) {
 		var applocation = appstate.getLocation();
 		var item = applocation.item;
-		var photoid = item.id;
-		//console.log('next Item ' + photoid);
 		onSwipeFunction(event, "left");
 	});
 	
@@ -351,7 +370,7 @@ itemViewPage.beforeShow = function()
 		const gConx = gPhotoTimeAPI.getConnection();
 		gConx.delItem(photoid, {
 			onSuccess: function(data) {
-				var adjSiblings = app.getAdjSiblings(item);
+				var adjSiblings = appstate.getAdjSiblings(item);
 				// now remove item from parent
 				app.removeItemFromParent(item, adjSiblings.idx);
 				if (adjSiblings.next) {

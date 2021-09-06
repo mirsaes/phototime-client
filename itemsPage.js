@@ -114,6 +114,27 @@ function renderEmptyFolderGroup(lvid, listView, group)
 		});		
 	});
 
+	$('a[data-rel="custom-back"]').unbind('click');
+	$('a[data-rel="custom-back"]').click(function(event) {
+		event.preventDefault();
+		$.mobile.loading('show');
+		var applocation = appstate.getLocation();
+		if (applocation.item.type=='folder' && applocation.parents.length > 0) {
+			// if have parents and parent is a folder
+			// than just change state and refresh
+			// otherwise issue go back
+			if (applocation.parents[applocation.parents.length-1].type == 'folder') {
+				app.doBack();
+				itemsPage.loadItems();
+			} else {
+				app.goBack();
+			}
+		}
+		$.mobile.loading('hide');
+		return false;
+	});
+
+
 	$('#' + lvid).listview('refresh');
 	$.mobile.loading('hide');
 	return;
