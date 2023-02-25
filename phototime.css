@@ -39,6 +39,12 @@ div.item-thumb
     align-items: center;
 }
 
+div.item-thumb > img
+{
+    max-width: 80pt;
+    max-height: 80pt;
+}
+
 img.item-thumb
 {
     max-width: 80pt;
